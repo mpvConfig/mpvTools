@@ -1,5 +1,5 @@
 ﻿# ============================================================
-#  mpv + VapourSynth (MVTools) 插帧功能 一键安装脚本 (终极防闪退版)
+#  mpv + VapourSynth (MVTools) 插帧功能 一键安装脚本 (便携免Python版)
 # ============================================================
 #requires -Version 5.1
 param(
@@ -15,6 +15,7 @@ $cfgDir    = Join-Path $mpvDir 'portable_config'
 $vsOutDir  = Join-Path $cfgDir 'vs'
 $inputConf = Join-Path $cfgDir 'input.conf'
 $readme    = Join-Path $mpvDir 'readme.txt'
+$vsPortableDir = Join-Path $mpvDir 'vapoursynth-portable'
 
 # ---------------- 输出辅助 ----------------
 function Info($m) { Write-Host "`n=== $m ===" -ForegroundColor Cyan }
@@ -36,7 +37,7 @@ Write-Host '  ======================================================' -Foregroun
 Write-Host '    mpv + VapourSynth (MVTools) 插帧功能 一键安装' -ForegroundColor DarkCyan
 Write-Host '  ======================================================' -ForegroundColor DarkCyan
 
-Info '步骤 0/8  检查运行环境'
+Info '步骤 0/7  检查运行环境'
 if (-not (Test-Path (Join-Path $mpvDir 'mpv.exe'))) {
     Warn "未在 $($mpvDir) 找到 mpv.exe，将继续按此目录处理。"
 } else {
@@ -47,7 +48,7 @@ if (-not [Environment]::Is64BitOperatingSystem) {
 }
 
 # ---------------- 步骤 1: portable_config ----------------
-Info '步骤 1/8  准备 portable_config 目录'
+Info '步骤 1/7  准备 portable_config 目录'
 if (-not (Test-Path $cfgDir)) {
     New-Item -ItemType Directory -Path $cfgDir -Force | Out-Null
     Ok '已创建 portable_config 文件夹'
@@ -57,117 +58,83 @@ if (-not (Test-Path $cfgDir)) {
 New-Item -ItemType Directory -Path $vsOutDir -Force | Out-Null
 Ok "插件/脚本输出目录: $vsOutDir"
 
-# ---------------- 步骤 2: Python ----------------
-function Find-Python {
-    $cand = @{}
-    if (Get-Command py -ErrorAction SilentlyContinue) {
-        try { $e = (& py -3 -c "import sys;print(sys.executable)" 2>$null); if ($LASTEXITCODE -eq 0 -and $e) { $cand[$e.Trim()] = 1 } } catch {}
-    }
-    if (Get-Command python -ErrorAction SilentlyContinue) {
-        try { $e = (& python -c "import sys;print(sys.executable)" 2>$null); if ($LASTEXITCODE -eq 0 -and $e) { $cand[$e.Trim()] = 1 } } catch {}
-    }
-    foreach ($ver in @('314','313','312','311','310')) {
-        foreach ($p in @(
-            "$env:LocalAppData\Programs\Python\Python$ver\python.exe",
-            "$env:ProgramFiles\Python$ver\python.exe",
-            "${env:ProgramFiles(x86)}\Python$ver\python.exe")) {
-            if (Test-Path $p) { $cand[$p] = 1 }
-        }
-    }
-    $best = $null; $bestVer = $null
-    foreach ($exe in $cand.Keys) {
-        try { 
-            $v = & $exe -c "import sys;print('%d.%d' % sys.version_info[:2])" 2>$null
-            if ($LASTEXITCODE -ne 0 -or -not $v) { continue }
-            $vv = [version]$v.Trim()
-            if ($vv -ge [version]'3.10' -and (-not $bestVer -or $vv -gt $bestVer)) { $best = $exe; $bestVer = $vv }
-        } catch {}
-    }
-    return @{ Exe = $best; Version = $bestVer }
-}
+# ---------------- 步骤 2: 下载并执行 VapourSynth 便携版 ----------------
+Info '步骤 2/7  下载并配置 VapourSynth 便携版'
 
-Info '步骤 2/8  检查 Python (3.10 或更高版本)'
-$pyInfo = Find-Python
-if (-not $pyInfo.Exe) {
-    Die '未找到可用的 Python 3.10+，请先去 python.org 安装。'
-}
-$py = $pyInfo.Exe
-Ok "Python: $py (v$($pyInfo.Version))"
-
-# ---------------- 步骤 3: 检查并自动安装 VapourSynth ----------------
-Info '步骤 3/8  检查并安装 VapourSynth'
-
-# 安全的测试函数，防止 PowerShell 因为 Python 的报错输出而强制闪退
-function Test-VSImport([string]$exe) {
-    try {
-        $null = & $exe -c "import vapoursynth" 2>&1
-        return ($LASTEXITCODE -eq 0)
-    } catch {
-        return $false
-    }
-}
-
-if (Test-VSImport $py) {
-    Ok 'VapourSynth 已安装且可正常导入，跳过安装。'
+if ((Test-Path $vsPortableDir) -and (-not $Force)) {
+    Ok '已存在 vapoursynth-portable 文件夹，跳过下载。'
 } else {
-    Warn '当前 Python 环境无法导入 VapourSynth，正在通过清华源自动下载安装...'
+    # 获取最新 Release 的 API 信息
+    $apiUrl = 'https://api.github.com/repos/vapoursynth/vapoursynth/releases/latest'
+    Write-Host "  正在获取 VapourSynth 最新版本信息..." -ForegroundColor DarkGray
     
-    # 使用 Start-Process 调用 pip，加入清华源
-    $pipArgs = @('-m', 'pip', 'install', '--upgrade', 'vapoursynth', '-i', 'https://pypi.tuna.tsinghua.edu.cn/simple')
-    $proc = Start-Process -FilePath $py -ArgumentList $pipArgs -Wait -PassThru -NoNewWindow
-    
-    if ($proc.ExitCode -ne 0) {
-        Die "VapourSynth 安装失败 (pip 退出码 $($proc.ExitCode))。请检查网络或手动安装。"
-    }
-
-    # 再次测试导入
-    if (-not (Test-VSImport $py)) {
-        Die 'VapourSynth 安装后仍无法导入，可能是缺少 VC++ 运行库 (vcruntime140.dll)。'
-    }
-    Ok 'VapourSynth 已成功下载并安装！'
-
-    # 执行系统级注册
-    Info '正在注册 VapourSynth 环境变量...'
-    $regArgs = @('-m', 'vapoursynth', 'register-install')
-    $regProc = Start-Process -FilePath $py -ArgumentList $regArgs -Wait -PassThru -NoNewWindow
-    
-    if ($regProc.ExitCode -eq 0) {
-        Ok 'VapourSynth 环境注册成功。'
-    } else {
-        Warn '环境注册失败，mpv 可能找不到 VapourSynth。'
-    }
-}
-
-# ---------------- 步骤 4: 环境变量补充 ----------------
-function Set-VSEnv([string]$exe) {
-    $dirs = @(Split-Path $exe)
     try {
-        $purelib = (& $exe -c "import sysconfig;print(sysconfig.get_path('purelib'))").Trim()
-        $vss = Get-ChildItem (Join-Path $purelib 'vapoursynth') -Recurse -Filter 'vsscript.dll' -ErrorAction SilentlyContinue | Select-Object -First 1
-        if ($vss) { $dirs += $vss.DirectoryName }
-    } catch {}
-    $userPath = [Environment]::GetEnvironmentVariable('Path','User')
-    if (-not $userPath) { $userPath = '' }
-    $added = @()
-    foreach ($d in $dirs) {
-        if ($d -and ($userPath -split ';') -notcontains $d) {
-            $userPath = ($userPath.TrimEnd(';') + ';' + $d).TrimStart(';')
-            $added += $d
-        }
+        $releaseInfo = Invoke-RestMethod -Uri $apiUrl -Headers @{ 'User-Agent' = 'mpv-Installer' } -ErrorAction Stop
+        # 寻找名字前缀为 Install-Portable 且以 .zip 结尾的附件
+        $asset = $releaseInfo.assets | Where-Object { $_.name -like 'Install-Portable-*.zip' } | Select-Object -First 1
+        
+        if (-not $asset) { throw '在最新 Release 中未找到 Install-Portable-*.zip 文件。' }
+        
+        $zipPath = Join-Path $env:TEMP $asset.name
+        $extractDir = Join-Path $env:TEMP ('vs_extract_' + [guid]::NewGuid().ToString('N'))
+        
+        Write-Host "  正在下载 $($asset.name)..." -ForegroundColor DarkGray
+        Invoke-WebRequest -Uri $asset.browser_download_url -OutFile $zipPath -UseBasicParsing -ErrorAction Stop
+        
+        Write-Host "  正在解压并提取安装脚本..." -ForegroundColor DarkGray
+        Expand-Archive -Path $zipPath -DestinationPath $extractDir -Force
+        $ps1Path = Get-ChildItem -Path $extractDir -Filter '*.ps1' -Recurse | Select-Object -First 1
+        
+        if (-not $ps1Path) { throw "解压后未找到 .ps1 安装脚本。" }
+        
+        Write-Host "  正在静默执行 VapourSynth 官方安装脚本..." -ForegroundColor DarkGray
+        # 使用官方脚本静默安装到 vapoursynth-portable 文件夹
+        $vsInstallArgs = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', "`"$($ps1Path.FullName)`"", '-TargetFolder', "`"$vsPortableDir`"", '-Unattended')
+        $installProc = Start-Process -FilePath 'powershell.exe' -ArgumentList $vsInstallArgs -Wait -PassThru -NoNewWindow
+        
+        if ($installProc.ExitCode -ne 0) { throw "VapourSynth 安装脚本返回错误码: $($installProc.ExitCode)" }
+        
+        # 清理临时文件
+        Remove-Item $zipPath -Force -ErrorAction SilentlyContinue
+        Remove-Item $extractDir -Recurse -Force -ErrorAction SilentlyContinue
+        
+        Ok 'VapourSynth 便携版下载并解压完成。'
     }
-    if ($added.Count -gt 0) {
-        [Environment]::SetEnvironmentVariable('Path', $userPath, 'User')
-        $env:Path = $env:Path.TrimEnd(';') + ';' + ($added -join ';')
-        Ok ('已加入用户 PATH: ' + ($added -join ' ; '))
-    } else {
-        Ok '用户 PATH 已包含所需目录，跳过'
+    catch {
+        Die "VapourSynth 下载或安装失败：$($_.Exception.Message)"
     }
 }
-Info '步骤 4/8  配置环境变量'
-Set-VSEnv $py
 
-# ---------------- 步骤 5: MVTools ----------------
-function Install-MVTools([string]$exe) {
+# ---------------- 步骤 3: 注册环境变量 ----------------
+Info '步骤 3/7  查找并注册 VSSCRIPT_PATH 环境变量'
+
+# 在便携版目录中递归查找 vsscript.dll
+$vsscriptDll = Get-ChildItem -Path $vsPortableDir -Filter 'vsscript.dll' -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
+
+if (-not $vsscriptDll) {
+    Die "在 $vsPortableDir 中未找到 vsscript.dll，安装可能不完整。"
+}
+
+$vsDllPath = $vsscriptDll.FullName
+$vsDllDir = $vsscriptDll.DirectoryName
+
+# 写入用户环境变量
+[Environment]::SetEnvironmentVariable('VSSCRIPT_PATH', $vsDllPath, 'User')
+$env:VSSCRIPT_PATH = $vsDllPath
+
+# 将目录加入 PATH（双重保险）
+$userPath = [Environment]::GetEnvironmentVariable('Path', 'User')
+if (-not $userPath) { $userPath = '' }
+if ($userPath -notlike "*$vsDllDir*") {
+    [Environment]::SetEnvironmentVariable('Path', "$userPath;$vsDllDir", 'User')
+    $env:Path = $env:Path.TrimEnd(';') + ';' + $vsDllDir
+}
+
+Ok "VSSCRIPT_PATH 已设置为: $vsDllPath"
+Ok "相关目录已加入用户 PATH。"
+
+# ---------------- 步骤 4: MVTools ----------------
+function Install-MVTools() {
     Info '安装 MVTools 插件（直链下载模式）'
     $url = 'https://github.com/mpvConfig/mpvTools/raw/refs/heads/main/vs/libmvtools.dll'
     $dllPath = Join-Path $vsOutDir 'mvtools.dll'
@@ -193,16 +160,16 @@ function Install-MVTools([string]$exe) {
     }
 }
 
-Info '步骤 5/8  检查 MVTools 插件'
+Info '步骤 4/7  检查 MVTools 插件'
 $haveMv = $null
 if (-not $Force) { $haveMv = Get-ChildItem $vsOutDir -Filter '*.dll' -ErrorAction SilentlyContinue | Where-Object { $_.Name -match 'mvtools' } | Select-Object -First 1 }
 if ($haveMv) {
     Ok "已存在插件: $($haveMv.Name)，跳过下载"
 } else {
-    Install-MVTools $py
+    Install-MVTools
 }
 
-# ---------------- 步骤 6: 生成 vpy 插帧脚本 ----------------
+# ---------------- 步骤 5: 生成 vpy 插帧脚本 ----------------
 function Write-Vpy([string]$file, [string]$title, [int]$threads, [string]$preset) {
     $content = @"
 # mpv MVTools 插帧 - $title 预设
@@ -235,7 +202,7 @@ $presets = @{
     '60fps-hq.vpy' = @('HQ', 8, "sup=core.mv.Super(clip,pel=2,sharp=2,hpad=16,vpad=16)`nbv=core.mv.Analyse(sup,isb=True,blksize=8,overlap=2,chroma=True,search=4,dct=1)`nfv=core.mv.Analyse(sup,isb=False,blksize=8,overlap=2,chroma=True,search=4,dct=1)`nclip=core.mv.BlockFPS(clip,sup,bv,fv,num=DST_FPS*1000,den=1000)")
 }
 
-Info '步骤 6/8  生成插帧脚本 (.vpy)'
+Info '步骤 5/7  生成插帧脚本 (.vpy)'
 foreach ($name in $presets.Keys) {
     $f = Join-Path $vsOutDir $name
     if ((Test-Path $f) -and (-not $Force)) {
@@ -246,18 +213,18 @@ foreach ($name in $presets.Keys) {
     }
 }
 
-# ---------------- 步骤 7: 写入 input.conf ----------------
+# ---------------- 步骤 6: 写入 input.conf ----------------
 $inputBlock = @'
 
 # ============ mpv MVTools 插帧 ============
 _  ignore  #menu: 视频增强 > 插帧模式 > -
-Alt+0 vf clr "" #menu: 视频增强 > 插帧模式 > 关闭 VS 插帧
-Alt+1 vf set vapoursynth="~~/vs/60fps-lq.vpy" #menu: 视频增强 > 插帧模式 > VS 插帧 LQ
-Alt+2 vf set vapoursynth="~~/vs/60fps-mq.vpy" #menu: 视频增强 > 插帧模式 > VS 插帧 MQ
-Alt+3 vf set vapoursynth="~~/vs/60fps-hq.vpy" #menu: 视频增强 > 插帧模式 > VS 插帧 HQ
+Alt+0 vf clr "" #menu: 视频增强 > 插帧模式 > 关闭 VS-MVTools 插帧
+Alt+1 vf set vapoursynth="~~/vs/60fps-lq.vpy" #menu: 视频增强 > 插帧模式 > VS-MVTools LQ
+Alt+2 vf set vapoursynth="~~/vs/60fps-mq.vpy" #menu: 视频增强 > 插帧模式 > VS-MVTools MQ
+Alt+3 vf set vapoursynth="~~/vs/60fps-hq.vpy" #menu: 视频增强 > 插帧模式 > VS-MVTools HQ
 '@
 
-Info '步骤 7/8  写入 input.conf 快捷键'
+Info '步骤 6/7  写入 input.conf 快捷键'
 if (Test-Path $inputConf) {
     $existing = ''
     try { $existing = [IO.File]::ReadAllText($inputConf) } catch {}
@@ -273,7 +240,7 @@ if (Test-Path $inputConf) {
     Ok '已新建 input.conf 并写入'
 }
 
-# ---------------- 步骤 8: 生成 readme.txt ----------------
+# ---------------- 步骤 7: 生成 readme.txt ----------------
 $readmeText = @'
 mpv + VapourSynth (MVTools) 插帧说明
 按 Alt+0 关闭，Alt+1 低画质，Alt+2 中画质，Alt+3 高画质。
