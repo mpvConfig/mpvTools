@@ -169,7 +169,7 @@ Set-VSEnv $py
 # ---------------- 步骤 5: MVTools ----------------
 function Install-MVTools([string]$exe) {
     Info '安装 MVTools 插件（直链下载模式）'
-    $url = 'https://github.com/akFace/tool/raw/refs/heads/master/mvtools.dll'
+    $url = 'https://github.com/mpvConfig/mpvTools/raw/refs/heads/main/vs/libmvtools.dll'
     $dllPath = Join-Path $vsOutDir 'mvtools.dll'
     $tmpDll = Join-Path $env:TEMP ('mvtools_' + [guid]::NewGuid().ToString('N') + '.dll')
 
