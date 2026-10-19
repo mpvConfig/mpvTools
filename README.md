@@ -1,4 +1,4 @@
-# MPV 播放器一键脚本安装 VapourSynth 的 MVTools 插帧/补帧功能
+# MPV 播放器一键脚本安装 VapourSynth MVTools 插帧/补帧功能
 
 ## Windows 用户安装教程
 
