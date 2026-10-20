@@ -11,18 +11,18 @@
 
 > Mac/Linux 端未测试，请自行测试（本人暂无真机进行测试，如出问题请自行 AI 修复）
 
-### macOS，下载文件 [Install-macos-VapourSynth](https://github.com/mpvConfig/mpvTools/blob/main/Install-macos-VapourSynth.sh)
+### macOS，下载文件 [Install-macos-VapourSynth.sh](https://github.com/mpvConfig/mpvTools/blob/main/Install-macos-VapourSynth.sh)
 
 给权限：
 
 ```bash
-chmod +x Install-macos-VapourSynth
+chmod +x Install-macos-VapourSynth.sh
 ```
 
 运行：
 
 ```bash
-./Install-macos-VapourSynth
+./Install-macos-VapourSynth.sh
 ```
 
 在脚本运行过程中，如果 Homebrew 需要密码（比如更新 Homebrew 软件库），它会**自动**在终端提示输入密码，输一下就行了。
@@ -58,7 +58,7 @@ Alt+6 vf set vapoursynth="~~/vs/open-svpflow-hq.vpy" #menu: 视频增强 > 插�
 
 ## 相关链接
 
-- [mpv](https://github.com/mpv-player/mpv)
+- [mpv.config](https://github.com/akFace/mpv.config)
 - [vapoursynth](https://github.com/vapoursynth/vapoursynth)
 - [vapoursynth-mvtools](https://github.com/dubhatervapoursynth/vapoursynth-mvtools)
 - [open-svpflow](https://github.com/Z1xus/open-svpflow)
