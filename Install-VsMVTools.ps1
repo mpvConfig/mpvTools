@@ -123,7 +123,7 @@ $vsscriptDllPath = Join-Path $mpvDir 'vsscript.dll'
 if ((Test-Path $vsscriptDllPath) -and (-not $Force)) {
     Ok '当前目录已存在 vsscript.dll，跳过下载。'
 } else {
-    $dllUrl = 'https://github.com/user-attachments/files/31946785/vsscript.dll.zip'
+    $dllUrl = 'https://github.com/mpvConfig/mpvTools/raw/refs/heads/main/vs/vsscript.dll.zip'
     $tmpZip = Join-Path $env:TEMP ('vsscript_' + [guid]::NewGuid().ToString('N') + '.zip')
     $extractDllDir = Join-Path $env:TEMP ('vsscript_extract_' + [guid]::NewGuid().ToString('N'))
 
