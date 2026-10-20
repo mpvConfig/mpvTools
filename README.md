@@ -11,7 +11,7 @@
 
 > Mac/Linux 端未测试，请自行测试（本人暂无真机进行测试，如出问题请自行 AI 修复）
 
-### macOS，下载文件 [Install-macos-VapourSynth](https://github.com/mpvConfig/mpvTools/blob/main/Install-macos-VapourSynth)
+### macOS，下载文件 [Install-macos-VapourSynth](https://github.com/mpvConfig/mpvTools/blob/main/Install-macos-VapourSynth.sh)
 
 给权限：
 
