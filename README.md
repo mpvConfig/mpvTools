@@ -5,41 +5,28 @@
 - 下载文件 [Install-Win-VapourSynth.ps1](https://github.com/mpvConfig/mpvTools/blob/main/Install-Win-VapourSynth.ps1)
 - 放到 mpv 播放器根目录下（`mpv.exe`同目录）
 - 选中 `Install-Win-VapourSynth.ps1`文件：右键 > 使用 PowerShell 运行
-- 下载的东西比较多（耐心等待）
+- 下载的东西比较多（耐心等待，如果失败可以重试几次或者开 vpn 代理）
 
 ## Mac/Linux 用户
 
 > Mac/Linux 端未测试，请自行测试（本人暂无真机进行测试，如出问题请自行 AI 修复）
 
-### macOS，下载文件 [Install-macos-VapourSynth.sh](https://github.com/mpvConfig/mpvTools/blob/main/Install-macos-VapourSynth.sh)
+- macOS，下载文件 ⇢ [Install-macos-VapourSynth.sh](https://github.com/mpvConfig/mpvTools/blob/main/Install-macos-VapourSynth.sh)
+- Linux，下载文件 ⇢ [Install-Linux-VapourSynth.sh](https://github.com/mpvConfig/mpvTools/blob/main/Install-Linux-VapourSynth.sh)
 
-给权限：
+给文件权限：
 
 ```bash
-chmod +x Install-macos-VapourSynth.sh
+chmod +x Install-xxxx-VapourSynth.sh
 ```
 
 运行：
 
 ```bash
-./Install-macos-VapourSynth.sh
+./Install-xxxx-VapourSynth.sh
 ```
 
-在脚本运行过程中，如果 Homebrew 需要密码（比如更新 Homebrew 软件库），它会**自动**在终端提示输入密码，输一下就行了。
-
-### Linux，下载文件 [Install-Linux-VapourSynth.sh](https://github.com/mpvConfig/mpvTools/blob/main/Install-Linux-VapourSynth.sh)
-
-给权限：
-
-```bash
-chmod +x Install-Linux-VapourSynth.sh
-```
-
-运行：
-
-```bash
-./Install-Linux-VapourSynth.sh
-```
+在脚本运行过程中，如果终端命令行需要密码，它会**自动**在终端提示输入密码，输一下就行了。
 
 ## 启用方式
 

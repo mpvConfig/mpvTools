@@ -33,6 +33,9 @@ except (NameError, vs.Error):
 if clip.fps_num >= DST_FPS * clip.fps_den * 0.9:
     clip.set_output()
 else:
+    # 强制转换为 SVP 支持的 8-bit YUV420P8 格式
+    if clip.format.id != vs.YUV420P8:
+        clip = clip.resize.Point(format=vs.YUV420P8, dither_type="random")
     super_result = core.svp1.Super(clip, SUPER_OPT)
     analyse_result = core.svp1.Analyse(
         super_result["clip"],
