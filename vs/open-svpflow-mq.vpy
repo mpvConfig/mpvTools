@@ -6,8 +6,8 @@ core = vs.core
 _here = os.path.dirname(os.path.abspath(__file__))
 
 DST_FPS = 60
-SUPER_OPT = '{"pel": 2, "scale": {"up": 0, "down": 4}}'
-ANALYSE_OPT = '{"block": {"w": 16, "overlap": 2}, "main": {"search": {"type": 2}}}'
+SUPER_OPT = '{"pel": 1, "gpu": 1}'
+ANALYSE_OPT = '{"block": {"w": 16, "overlap": 2}, "main": {"search": {"coarse": {"distance": -1, "trymany": true, "bad": {"sad": 2000}}}}}'
 SMOOTH_OPT = '{"rate": {"num": 60, "den": 1, "abs": true}, "algo": 13, "mask": {"area": 100}}'
 
 # 加载 SVPFlow / open-svpflow 插件

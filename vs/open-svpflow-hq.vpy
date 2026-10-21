@@ -6,9 +6,9 @@ core = vs.core
 _here = os.path.dirname(os.path.abspath(__file__))
 
 DST_FPS = 60
-SUPER_OPT = '{"pel": 2, "scale": {"up": 2, "down": 4}}'
-ANALYSE_OPT = '{"block": {"w": 8, "overlap": 2}, "main": {"search": {"type": 3, "refine": [{"thsad": 250}]}}}'
-SMOOTH_OPT = '{"rate": {"num": 60, "den": 1, "abs": true}, "algo": 23, "mask": {"area": 50, "cover": 80}}'
+SUPER_OPT = '{"gpu": 1}'
+ANALYSE_OPT = '{"block": {"w": 8, "overlap": 2}, "main": {"search": {"distance": 0, "coarse": {"distance": -1, "trymany": true, "bad": {"sad": 2000}}}}, "refine": [{"thsad": 250, "search": {"distance": -1, "satd": true}}]}'
+SMOOTH_OPT = '{"rate": {"num": 60, "den": 1, "abs": true}, "algo": 23, "mask": {"cover": 80, "area": 0, "area_sharp": 1.2}, "scene": {"blend": true, "mode": 0, "limits": {"blocks": 50}}}'
 
 # 加载 SVPFlow / open-svpflow 插件
 for dll in ("svpflow1_vs.dll", "svpflow2_vs.dll"):
