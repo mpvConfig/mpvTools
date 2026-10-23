@@ -15,11 +15,14 @@ core.num_threads = THREADS
 _here = os.path.dirname(os.path.abspath(__file__))
 
 # 若 mvtools 未被自动加载，则加载与本脚本同目录下的插件 dll（兼容各版本 VapourSynth）
+# 跨平台加载 mvtools 插件（兼容 .dll/.dylib/.so）
 try:
     _mv = core.mv
 except AttributeError:
+    import sys
+    ext = '.dll' if sys.platform == 'win32' else ('.dylib' if sys.platform == 'darwin' else '.so')
     for _f in os.listdir(_here):
-        if _f.lower().endswith('.dll') and 'mvtools' in _f.lower():
+        if _f.lower().endswith(ext) and 'mvtools' in _f.lower():
             try:
                 core.std.LoadPlugin(os.path.join(_here, _f), altsearchpath=True)
             except vs.Error:
