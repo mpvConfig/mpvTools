@@ -5,7 +5,8 @@
 - 下载文件 [Install-Win-VapourSynth.ps1](https://github.com/mpvConfig/mpvTools/blob/main/Install-Win-VapourSynth.ps1)
 - 放到 mpv 播放器根目录下（`mpv.exe`同目录）
 - 选中 `Install-Win-VapourSynth.ps1`文件：右键 > 使用 PowerShell 运行
-- 下载的东西比较多（耐心等待，如果失败可以重试几次或者开 vpn 代理）
+- 输入所需的语言版本
+- 下载的东西比较多（耐心等待，如果失败可以重试几次或者开 vpn 代理） ⇢ [无法下载解决方案](https://github.com/mpvConfig/mpvTools/issues/1)
 
 ## Mac/Linux 用户
 
@@ -33,6 +34,7 @@ chmod +x Install-xxxx-VapourSynth.sh
 - 安装成功会自动增加以下快捷键到 `input.conf` 可通过快捷键启用或者右键菜单选择启用插帧，无需任何操作设置
 
 ```conf
+_       ignore  #menu: 视频增强 > 插帧模式 > -
 Alt+0 vf clr "" #menu: 视频增强 > 插帧模式 > 关闭 VS 插帧
 Alt+1 vf set vapoursynth="~~/vs/60fps-lq.vpy" #menu: 视频增强 > 插帧模式 > VS-MVTools LQ
 Alt+2 vf set vapoursynth="~~/vs/60fps-mq.vpy" #menu: 视频增强 > 插帧模式 > VS-MVTools MQ
