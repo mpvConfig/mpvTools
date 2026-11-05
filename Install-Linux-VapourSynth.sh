@@ -1,6 +1,10 @@
 #!/bin/bash
 set -e
+
 echo "=== Installing mpv + VapourSynth + MVTools + open-svpflow (Linux/Ubuntu) ==="
+
+# ---------------- Shared i18n URL ----------------
+I18N_URL="https://github.com/mpvConfig/mpvTools/raw/refs/heads/main/static/vs-i18n.txt"
 
 # ---------------- Language selection ----------------
 echo ""
@@ -19,45 +23,10 @@ while true; do
     esac
 done
 
-# ---------------- Localization data (only inputBlock) ----------------
-case "$LANG_CHOICE" in
-    zh)
-        INPUT_BLOCK=$(cat << 'EOF'
-
-# ============ mpv MVTools 插帧 ============
-Alt+0 vf clr "" #menu: 视频增强 > 插帧模式 > 关闭 VS 插帧
-Alt+1 vf set vapoursynth="~~/vs/60fps-lq.vpy" #menu: 视频增强 > 插帧模式 > VS-MVTools LQ
-Alt+2 vf set vapoursynth="~~/vs/60fps-mq.vpy" #menu: 视频增强 > 插帧模式 > VS-MVTools MQ
-Alt+3 vf set vapoursynth="~~/vs/60fps-hq.vpy" #menu: 视频增强 > 插帧模式 > VS-MVTools HQ
-
-# ============ mpv open-svpflow 插帧 ============
-Alt+4 vf set vapoursynth="~~/vs/open-svpflow-lq.vpy" #menu: 视频增强 > 插帧模式 > VS-OPEN-SVP LQ
-Alt+5 vf set vapoursynth="~~/vs/open-svpflow-mq.vpy" #menu: 视频增强 > 插帧模式 > VS-OPEN-SVP MQ
-Alt+6 vf set vapoursynth="~~/vs/open-svpflow-hq.vpy" #menu: 视频增强 > 插帧模式 > VS-OPEN-SVP HQ
-EOF
-)
-        ;;
-    zh-TW)
-        INPUT_BLOCK=$(cat << 'EOF'
-
-# ============ mpv MVTools 插幀 ============
-Alt+0 vf clr "" #menu: 影片增強 > 插幀模式 > 關閉 VS 插幀
-Alt+1 vf set vapoursynth="~~/vs/60fps-lq.vpy" #menu: 影片增強 > 插幀模式 > VS-MVTools LQ
-Alt+2 vf set vapoursynth="~~/vs/60fps-mq.vpy" #menu: 影片增強 > 插幀模式 > VS-MVTools MQ
-Alt+3 vf set vapoursynth="~~/vs/60fps-hq.vpy" #menu: 影片增強 > 插幀模式 > VS-MVTools HQ
-
-# ============ mpv open-svpflow 插幀 ============
-Alt+4 vf set vapoursynth="~~/vs/open-svpflow-lq.vpy" #menu: 影片增強 > 插幀模式 > VS-OPEN-SVP LQ
-Alt+5 vf set vapoursynth="~~/vs/open-svpflow-mq.vpy" #menu: 影片增強 > 插幀模式 > VS-OPEN-SVP MQ
-Alt+6 vf set vapoursynth="~~/vs/open-svpflow-hq.vpy" #menu: 影片增強 > 插幀模式 > VS-OPEN-SVP HQ
-EOF
-)
-        ;;
-    en|*)
-        INPUT_BLOCK=$(cat << 'EOF'
-
+# ---------------- Built-in English fallback ----------------
+FALLBACK_BLOCK=$(cat << 'EOF'
 # ============ mpv MVTools Interpolation ============
-Alt+0 vf clr "" #menu: Video FX > Interpolation > Disable VapourSynth Interpolation
+Alt+0 vf clr "" #menu: Video FX > Interpolation > Disable VapourSynth
 Alt+1 vf set vapoursynth="~~/vs/60fps-lq.vpy" #menu: Video FX > Interpolation > VS-MVTools LQ
 Alt+2 vf set vapoursynth="~~/vs/60fps-mq.vpy" #menu: Video FX > Interpolation > VS-MVTools MQ
 Alt+3 vf set vapoursynth="~~/vs/60fps-hq.vpy" #menu: Video FX > Interpolation > VS-MVTools HQ
@@ -68,8 +37,39 @@ Alt+5 vf set vapoursynth="~~/vs/open-svpflow-mq.vpy" #menu: Video FX > Interpola
 Alt+6 vf set vapoursynth="~~/vs/open-svpflow-hq.vpy" #menu: Video FX > Interpolation > VS-OPEN-SVP HQ
 EOF
 )
-        ;;
-esac
+
+# ---------------- Extract a [lang] section from vs-i18n.txt ----------------
+load_input_block() {
+    awk -v lang="[$2]" '
+        $0 == lang { inside=1; next }
+        /^\[[^]]+\]$/ { inside=0 }
+        inside { print }
+    ' "$1" | awk 'BEGIN{blank=0} {lines[NR]=$0} END{
+        last=NR
+        while (last>0 && lines[last] ~ /^[[:space:]]*$/) last--
+        for (i=1;i<=last;i++) print lines[i]
+    }'
+}
+
+# ---------------- Download and load shared i18n ----------------
+I18N_TMP="$(mktemp -t vs-i18n.XXXXXX.txt)"
+cleanup_i18n() { rm -f "$I18N_TMP"; }
+trap cleanup_i18n EXIT
+
+if curl -fsSL -o "$I18N_TMP" "$I18N_URL" 2>/dev/null && [ -s "$I18N_TMP" ]; then
+    INPUT_BLOCK="$(load_input_block "$I18N_TMP" "$LANG_CHOICE")"
+    if [ -n "$INPUT_BLOCK" ]; then
+        echo "Loaded localization data ($LANG_CHOICE)."
+    else
+        echo "  [!!] Language '$LANG_CHOICE' not found in localization data."
+        echo "  [!!] Falling back to built-in English defaults."
+        INPUT_BLOCK="$FALLBACK_BLOCK"
+    fi
+else
+    echo "  [!!] Failed to download localization data from: $I18N_URL"
+    echo "  [!!] Falling back to built-in English defaults."
+    INPUT_BLOCK="$FALLBACK_BLOCK"
+fi
 
 # 1. Install system-level dependencies (elevate only here)
 echo "Updating package lists and installing mpv, pip3 (administrator privileges required)..."
@@ -110,7 +110,7 @@ if grep -q "open-svpflow-lq.vpy" "$INPUT_CONF" 2>/dev/null; then
     echo "Hotkeys already present, skipping configuration."
 else
     echo "Adding hotkeys..."
-    printf '%s\n' "$INPUT_BLOCK" >> "$INPUT_CONF"
+    printf '\n%s\n' "$INPUT_BLOCK" >> "$INPUT_CONF"
 fi
 
 echo "=== Installation complete! Run 'mpv <video>' in a terminal to test ==="

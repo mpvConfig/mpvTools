@@ -35,6 +35,7 @@ During the script run, if the terminal command line requires a password, it will
 
 ## How to Enable
 
+- [vs-i18n.txt](https://github.com/mpvConfig/mpvTools/raw/refs/heads/main/static/vs-i18n.txt)
 - After a successful installation, the following shortcuts will be automatically added to `input.conf`. You can enable frame interpolation via the shortcuts or by selecting it from the right-click menu, with no additional setup required.
 
 ```conf
@@ -83,6 +84,7 @@ chmod +x Install-xxxx-VapourSynth.sh
 
 ## 启用方式
 
+- 安装时可选的快捷键的语言配置文件：[vs-i18n.txt](https://github.com/mpvConfig/mpvTools/raw/refs/heads/main/static/vs-i18n.txt)
 - 安装成功会自动增加以下快捷键到 `input.conf` 可通过快捷键启用或者右键菜单选择启用插帧，无需任何操作设置
 
 ```conf

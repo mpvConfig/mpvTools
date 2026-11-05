@@ -1,0 +1,38 @@
+[zh]
+# ============ mpv MVTools 插帧 ============
+_  ignore  #menu: 视频增强 > 插帧模式 > -
+Alt+0 vf clr "" #menu: 视频增强 > 插帧模式 > 关闭 VS 插帧
+Alt+1 vf set vapoursynth="~~/vs/60fps-lq.vpy" #menu: 视频增强 > 插帧模式 > VS-MVTools LQ
+Alt+2 vf set vapoursynth="~~/vs/60fps-mq.vpy" #menu: 视频增强 > 插帧模式 > VS-MVTools MQ
+Alt+3 vf set vapoursynth="~~/vs/60fps-hq.vpy" #menu: 视频增强 > 插帧模式 > VS-MVTools HQ
+
+# ============ mpv open-svpflow 插帧 ============
+Alt+4 vf set vapoursynth="~~/vs/open-svpflow-lq.vpy" #menu: 视频增强 > 插帧模式 > VS-OPEN-SVP LQ
+Alt+5 vf set vapoursynth="~~/vs/open-svpflow-mq.vpy" #menu: 视频增强 > 插帧模式 > VS-OPEN-SVP MQ
+Alt+6 vf set vapoursynth="~~/vs/open-svpflow-hq.vpy" #menu: 视频增强 > 插帧模式 > VS-OPEN-SVP HQ
+
+[zh-TW]
+# ============ mpv MVTools 插幀 ============
+_  ignore  #menu: 影片增強 > 插幀模式 > -
+Alt+0 vf clr "" #menu: 影片增強 > 插幀模式 > 關閉 VS 插幀
+Alt+1 vf set vapoursynth="~~/vs/60fps-lq.vpy" #menu: 影片增強 > 插幀模式 > VS-MVTools LQ
+Alt+2 vf set vapoursynth="~~/vs/60fps-mq.vpy" #menu: 影片增強 > 插幀模式 > VS-MVTools MQ
+Alt+3 vf set vapoursynth="~~/vs/60fps-hq.vpy" #menu: 影片增強 > 插幀模式 > VS-MVTools HQ
+
+# ============ mpv open-svpflow 插幀 ============
+Alt+4 vf set vapoursynth="~~/vs/open-svpflow-lq.vpy" #menu: 影片增強 > 插幀模式 > VS-OPEN-SVP LQ
+Alt+5 vf set vapoursynth="~~/vs/open-svpflow-mq.vpy" #menu: 影片增強 > 插幀模式 > VS-OPEN-SVP MQ
+Alt+6 vf set vapoursynth="~~/vs/open-svpflow-hq.vpy" #menu: 影片增強 > 插幀模式 > VS-OPEN-SVP HQ
+
+[en]
+# ============ mpv MVTools Interpolation ============
+_  ignore  #menu: Video FX > Interpolation > -
+Alt+0 vf clr "" #menu: Video FX > Interpolation > Disable VapourSynth
+Alt+1 vf set vapoursynth="~~/vs/60fps-lq.vpy" #menu: Video FX > Interpolation > VS-MVTools LQ
+Alt+2 vf set vapoursynth="~~/vs/60fps-mq.vpy" #menu: Video FX > Interpolation > VS-MVTools MQ
+Alt+3 vf set vapoursynth="~~/vs/60fps-hq.vpy" #menu: Video FX > Interpolation > VS-MVTools HQ
+
+# ============ mpv open-svpflow Interpolation ============
+Alt+4 vf set vapoursynth="~~/vs/open-svpflow-lq.vpy" #menu: Video FX > Interpolation > VS-OPEN-SVP LQ
+Alt+5 vf set vapoursynth="~~/vs/open-svpflow-mq.vpy" #menu: Video FX > Interpolation > VS-OPEN-SVP MQ
+Alt+6 vf set vapoursynth="~~/vs/open-svpflow-hq.vpy" #menu: Video FX > Interpolation > VS-OPEN-SVP HQ

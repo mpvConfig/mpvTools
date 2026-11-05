@@ -14,8 +14,10 @@ $mpvDir    = $PSScriptRoot
 $cfgDir    = Join-Path $mpvDir 'portable_config'
 $vsOutDir  = Join-Path $cfgDir 'vs'
 $inputConf = Join-Path $cfgDir 'input.conf'
-$readme    = Join-Path $mpvDir 'readme.txt'
 $vsPortableDir = Join-Path $mpvDir 'vapoursynth-portable'
+
+# ---------------- Shared i18n URL ----------------
+$i18nUrl = 'https://github.com/mpvConfig/mpvTools/raw/refs/heads/main/static/vs-i18n.txt'
 
 # ---------------- Output helpers ----------------
 function Info($m) { Write-Host "`n=== $m ===" -ForegroundColor Cyan }
@@ -43,74 +45,17 @@ function Select-Language {
             'zh'    { return 'zh' }
             'zh-tw' { return 'zh-TW' }
             'en'    { return 'en' }
-            default {
-                Warn "Invalid choice: '$choice'. Please enter zh, zh-TW or en."
-            }
+            default { Warn "Invalid choice: '$choice'. Please enter zh, zh-TW or en." }
         }
     }
 }
 
-# ---------------- Localization data (only inputBlock & readmeText) ----------------
-$i18n = @{}
-
-$i18n['zh'] = @{
-    'inputBlock' = @'
-
-# ============ mpv MVTools 插帧 ============
-_  ignore  #menu: 视频增强 > 插帧模式 > -
-Alt+0 vf clr "" #menu: 视频增强 > 插帧模式 > 关闭 VS 插帧
-Alt+1 vf set vapoursynth="~~/vs/60fps-lq.vpy" #menu: 视频增强 > 插帧模式 > VS-MVTools LQ
-Alt+2 vf set vapoursynth="~~/vs/60fps-mq.vpy" #menu: 视频增强 > 插帧模式 > VS-MVTools MQ
-Alt+3 vf set vapoursynth="~~/vs/60fps-hq.vpy" #menu: 视频增强 > 插帧模式 > VS-MVTools HQ
-
-# ============ mpv open-svpflow 插帧 ============
-Alt+4 vf set vapoursynth="~~/vs/open-svpflow-lq.vpy" #menu: 视频增强 > 插帧模式 > VS-OPEN-SVP LQ
-Alt+5 vf set vapoursynth="~~/vs/open-svpflow-mq.vpy" #menu: 视频增强 > 插帧模式 > VS-OPEN-SVP MQ
-Alt+6 vf set vapoursynth="~~/vs/open-svpflow-hq.vpy" #menu: 视频增强 > 插帧模式 > VS-OPEN-SVP HQ
-'@
-    'readmeText' = @'
-mpv + VapourSynth 插帧说明
-
-MVTools (Alt+1/2/3)：基于运动补偿的传统插帧，兼容性好。
-open-svpflow (Alt+4/5/6)：SVP 算法的开源重写版，支持 VapourSynth API 4，性能优于原版 SVPflow。
-
-按 Alt+0 关闭插帧。
-播放时按 i 键可查看是否出现 vapoursynth 滤镜和帧率变化。
-'@
-}
-
-$i18n['zh-TW'] = @{
-    'inputBlock' = @'
-
-# ============ mpv MVTools 插幀 ============
-_  ignore  #menu: 影片增強 > 插幀模式 > -
-Alt+0 vf clr "" #menu: 影片增強 > 插幀模式 > 關閉 VS 插幀
-Alt+1 vf set vapoursynth="~~/vs/60fps-lq.vpy" #menu: 影片增強 > 插幀模式 > VS-MVTools LQ
-Alt+2 vf set vapoursynth="~~/vs/60fps-mq.vpy" #menu: 影片增強 > 插幀模式 > VS-MVTools MQ
-Alt+3 vf set vapoursynth="~~/vs/60fps-hq.vpy" #menu: 影片增強 > 插幀模式 > VS-MVTools HQ
-
-# ============ mpv open-svpflow 插幀 ============
-Alt+4 vf set vapoursynth="~~/vs/open-svpflow-lq.vpy" #menu: 影片增強 > 插幀模式 > VS-OPEN-SVP LQ
-Alt+5 vf set vapoursynth="~~/vs/open-svpflow-mq.vpy" #menu: 影片增強 > 插幀模式 > VS-OPEN-SVP MQ
-Alt+6 vf set vapoursynth="~~/vs/open-svpflow-hq.vpy" #menu: 影片增強 > 插幀模式 > VS-OPEN-SVP HQ
-'@
-    'readmeText' = @'
-mpv + VapourSynth 插幀說明
-
-MVTools (Alt+1/2/3)：基於運動補償的傳統插幀，相容性好。
-open-svpflow (Alt+4/5/6)：SVP 演算法的開源重寫版，支援 VapourSynth API 4，效能優於原版 SVPflow。
-
-按 Alt+0 關閉插幀。
-播放時按 i 鍵可查看是否出現 vapoursynth 濾鏡和幀率變化。
-'@
-}
-
-$i18n['en'] = @{
-    'inputBlock' = @'
-
+# ---------------- Built-in English fallback ----------------
+function Get-FallbackInputBlock {
+    return @'
 # ============ mpv MVTools Interpolation ============
 _  ignore  #menu: Video FX > Interpolation > -
-Alt+0 vf clr "" #menu: Video FX > Interpolation > Disable VapourSynth Interpolation
+Alt+0 vf clr "" #menu: Video FX > Interpolation > Disable VapourSynth
 Alt+1 vf set vapoursynth="~~/vs/60fps-lq.vpy" #menu: Video FX > Interpolation > VS-MVTools LQ
 Alt+2 vf set vapoursynth="~~/vs/60fps-mq.vpy" #menu: Video FX > Interpolation > VS-MVTools MQ
 Alt+3 vf set vapoursynth="~~/vs/60fps-hq.vpy" #menu: Video FX > Interpolation > VS-MVTools HQ
@@ -120,20 +65,49 @@ Alt+4 vf set vapoursynth="~~/vs/open-svpflow-lq.vpy" #menu: Video FX > Interpola
 Alt+5 vf set vapoursynth="~~/vs/open-svpflow-mq.vpy" #menu: Video FX > Interpolation > VS-OPEN-SVP MQ
 Alt+6 vf set vapoursynth="~~/vs/open-svpflow-hq.vpy" #menu: Video FX > Interpolation > VS-OPEN-SVP HQ
 '@
-    'readmeText' = @'
-mpv + VapourSynth Interpolation Notes
+}
 
-MVTools (Alt+1/2/3): Traditional motion-compensated interpolation with good compatibility.
-open-svpflow (Alt+4/5/6): Open-source rewrite of the SVP algorithm, supports VapourSynth API 4, faster than the original SVPflow.
+# ---------------- Parse a [lang] section out of vs-i18n.txt ----------------
+function Get-InputBlockFromFile([string]$path, [string]$lang) {
+    $lines = Get-Content -Path $path -Encoding UTF8
+    $marker = "[$lang]"
+    $inside = $false
+    $out = New-Object System.Collections.Generic.List[string]
+    foreach ($line in $lines) {
+        if ($line -eq $marker) { $inside = $true; continue }
+        if ($line -match '^\[[^\]]+\]$') { $inside = $false; continue }
+        if ($inside) { $out.Add($line) }
+    }
+    if ($out.Count -eq 0) { throw "Language '$lang' not found in localization file." }
+    # Trim trailing blank lines, then join
+    while ($out.Count -gt 0 -and [string]::IsNullOrWhiteSpace($out[$out.Count - 1])) {
+        $out.RemoveAt($out.Count - 1)
+    }
+    return ($out -join "`n")
+}
 
-Press Alt+0 to disable interpolation.
-Press i during playback to check whether the vapoursynth filter is active and the frame rate has changed.
-'@
+# ---------------- Download and load shared i18n ----------------
+function Get-InputBlock([string]$lang) {
+    $tmpTxt = Join-Path $env:TEMP ('vs-i18n_' + [guid]::NewGuid().ToString('N') + '.txt')
+    try {
+        Write-Host "  Downloading localization data from: $i18nUrl" -ForegroundColor DarkGray
+        Invoke-WebRequest -Uri $i18nUrl -OutFile $tmpTxt -UseBasicParsing -ErrorAction Stop
+        $block = Get-InputBlockFromFile $tmpTxt $lang
+        Write-Host "  Loaded localization data ($lang)." -ForegroundColor DarkGray
+        return $block
+    }
+    catch {
+        Warn "Failed to load localization data: $($_.Exception.Message)"
+        Warn 'Falling back to built-in English defaults.'
+        return (Get-FallbackInputBlock)
+    }
+    finally {
+        if (Test-Path $tmpTxt) { Remove-Item $tmpTxt -Force -ErrorAction SilentlyContinue }
+    }
 }
 
 $lang = Select-Language
-$inputBlock = $i18n[$lang]['inputBlock']
-$readmeText = $i18n[$lang]['readmeText']
+$inputBlock = Get-InputBlock $lang
 
 # ---------------- Step 0: Environment check ----------------
 Write-Host ''
@@ -141,7 +115,7 @@ Write-Host '  ======================================================' -Foregroun
 Write-Host '    mpv + VapourSynth Interpolation (MVTools / open-svpflow) One-Click Installer' -ForegroundColor DarkCyan
 Write-Host '  ======================================================' -ForegroundColor DarkCyan
 
-Info 'Step 1/7  Checking environment'
+Info 'Step 0/7  Checking environment'
 if (-not (Test-Path (Join-Path $mpvDir 'mpv.exe'))) {
     Warn "mpv.exe not found in $($mpvDir); continuing with this directory anyway."
 } else {
@@ -151,8 +125,8 @@ if (-not [Environment]::Is64BitOperatingSystem) {
     Die 'Interpolation components only support 64-bit Windows; current system is 32-bit.'
 }
 
-# ---------------- Step 2: portable_config ----------------
-Info 'Step 2/7  Preparing portable_config directory'
+# ---------------- Step 1: portable_config ----------------
+Info 'Step 1/7  Preparing portable_config directory'
 if (-not (Test-Path $cfgDir)) {
     New-Item -ItemType Directory -Path $cfgDir -Force | Out-Null
     Ok 'Created portable_config folder'
@@ -162,8 +136,8 @@ if (-not (Test-Path $cfgDir)) {
 New-Item -ItemType Directory -Path $vsOutDir -Force | Out-Null
 Ok "Plugin/script output directory: $vsOutDir"
 
-# ---------------- Step 3: VapourSynth portable (flattened) ----------------
-Info 'Step 3/7  Downloading and configuring VapourSynth (flattened mode)'
+# ---------------- Step 2: VapourSynth portable (flattened) ----------------
+Info 'Step 2/7  Downloading and configuring VapourSynth (flattened mode)'
 
 if ((Test-Path (Join-Path $mpvDir 'python.exe')) -and (-not $Force)) {
     Ok 'VapourSynth core files already exist in this directory, skipping download.'
@@ -174,7 +148,6 @@ if ((Test-Path (Join-Path $mpvDir 'python.exe')) -and (-not $Force)) {
     try {
         $releaseInfo = Invoke-RestMethod -Uri $apiUrl -Headers @{ 'User-Agent' = 'mpv-Installer' } -ErrorAction Stop
         $asset = $releaseInfo.assets | Where-Object { $_.name -like 'Install-Portable-*.zip' } | Select-Object -First 1
-
         if (-not $asset) { throw 'No Install-Portable-*.zip found in the latest Release.' }
 
         $zipPath = Join-Path $env:TEMP $asset.name
@@ -186,13 +159,11 @@ if ((Test-Path (Join-Path $mpvDir 'python.exe')) -and (-not $Force)) {
         Write-Host '  Extracting and locating install script...' -ForegroundColor DarkGray
         Expand-Archive -Path $zipPath -DestinationPath $extractDir -Force
         $ps1Path = Get-ChildItem -Path $extractDir -Filter '*.ps1' -Recurse | Select-Object -First 1
-
         if (-not $ps1Path) { throw 'No .ps1 install script found after extraction.' }
 
         Write-Host '  Installing VapourSynth silently...' -ForegroundColor DarkGray
         $vsInstallArgs = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', "`"$($ps1Path.FullName)`"", '-TargetFolder', "`"$vsPortableDir`"", '-Unattended')
         $installProc = Start-Process -FilePath 'powershell.exe' -ArgumentList $vsInstallArgs -Wait -PassThru -NoNewWindow
-
         if ($installProc.ExitCode -ne 0) { throw "VapourSynth install script returned error code: $($installProc.ExitCode)" }
 
         Write-Host '  Flattening files into the mpv root directory...' -ForegroundColor DarkGray
@@ -215,8 +186,8 @@ if ((Test-Path (Join-Path $mpvDir 'python.exe')) -and (-not $Force)) {
     }
 }
 
-# ---------------- Step 4: vsscript.dll ----------------
-Info 'Step 4/7  Downloading and placing vsscript.dll'
+# ---------------- Step 3: vsscript.dll ----------------
+Info 'Step 3/7  Downloading and placing vsscript.dll'
 
 $vsscriptDllPath = Join-Path $mpvDir 'vsscript.dll'
 
@@ -231,12 +202,10 @@ if ((Test-Path $vsscriptDllPath) -and (-not $Force)) {
     try {
         Write-Host '  Downloading vsscript.dll.zip from the specified link...' -ForegroundColor DarkGray
         Invoke-WebRequest -Uri $dllUrl -OutFile $tmpZip -UseBasicParsing -ErrorAction Stop
-
         Write-Host '  Extracting...' -ForegroundColor DarkGray
         Expand-Archive -Path $tmpZip -DestinationPath $extractDllDir -Force
 
         $extractedDll = Get-ChildItem -Path $extractDllDir -Filter 'vsscript.dll' -Recurse | Select-Object -First 1
-
         if ($extractedDll) {
             Move-Item -Path $extractedDll.FullName -Destination $vsscriptDllPath -Force -ErrorAction Stop
             Ok 'vsscript.dll placed successfully alongside mpv.'
@@ -254,10 +223,9 @@ if ((Test-Path $vsscriptDllPath) -and (-not $Force)) {
     }
 }
 
-# ---------------- Step 5: MVTools + open-svpflow ----------------
-Info 'Step 5/7  Checking MVTools and open-svpflow plugins'
+# ---------------- Step 4: MVTools + open-svpflow ----------------
+Info 'Step 4/7  Checking MVTools and open-svpflow plugins'
 
-# MVTools (download zip and extract)
 $haveMv = $null
 if (-not $Force) { $haveMv = Get-ChildItem $vsOutDir -Filter '*mvtools*' -ErrorAction SilentlyContinue | Select-Object -First 1 }
 if ($haveMv) {
@@ -288,7 +256,6 @@ if ($haveMv) {
     }
 }
 
-# open-svpflow (full extraction)
 $haveSvp = $null
 if (-not $Force) { $haveSvp = Get-ChildItem $vsOutDir -Filter 'svpflow*_vs.dll' -ErrorAction SilentlyContinue }
 if ($haveSvp -and $haveSvp.Count -ge 2) {
@@ -301,7 +268,6 @@ if ($haveSvp -and $haveSvp.Count -ge 2) {
         $svpAsset = $svpRelease.assets | Where-Object {
             $_.name -match 'windows|win64' -and $_.name -match '\.zip$'
         } | Select-Object -First 1
-
         if (-not $svpAsset) {
             $svpAsset = $svpRelease.assets | Where-Object { $_.name -match 'svpflow' -and $_.name -match '\.zip$' } | Select-Object -First 1
         }
@@ -314,7 +280,6 @@ if ($haveSvp -and $haveSvp.Count -ge 2) {
         Invoke-WebRequest -Uri $svpAsset.browser_download_url -OutFile $tmpSvpZip -UseBasicParsing -ErrorAction Stop
         Expand-Archive -Path $tmpSvpZip -DestinationPath $extractSvpDir -Force
 
-        # Copy all extracted files into the vs directory
         Copy-Item -Path "$extractSvpDir\*" -Destination $vsOutDir -Recurse -Force
         Ok 'All open-svpflow files extracted into the vs directory.'
     } catch {
@@ -326,18 +291,13 @@ if ($haveSvp -and $haveSvp.Count -ge 2) {
     }
 }
 
-# ---------------- Step 6: vpy interpolation scripts ----------------
-Info 'Step 6/7  Downloading interpolation scripts (.vpy)'
+# ---------------- Step 5: vpy interpolation scripts ----------------
+Info 'Step 5/7  Downloading interpolation scripts (.vpy)'
 
 $vpyFiles = @(
-    '60fps-lq.vpy',
-    '60fps-mq.vpy',
-    '60fps-hq.vpy',
-    'open-svpflow-lq.vpy',
-    'open-svpflow-mq.vpy',
-    'open-svpflow-hq.vpy'
+    '60fps-lq.vpy', '60fps-mq.vpy', '60fps-hq.vpy',
+    'open-svpflow-lq.vpy', 'open-svpflow-mq.vpy', 'open-svpflow-hq.vpy'
 )
-
 $baseUrl = 'https://github.com/mpvConfig/mpvTools/raw/refs/heads/main/vs/'
 
 foreach ($file in $vpyFiles) {
@@ -355,26 +315,26 @@ foreach ($file in $vpyFiles) {
     }
 }
 
-# ---------------- Step 7: input.conf and readme ----------------
-Info 'Step 7/7  Writing configuration and notes'
+# ---------------- Step 6: input.conf ----------------
+Info 'Step 6/7  Writing configuration'
 if (Test-Path $inputConf) {
     $existing = ''
     try { $existing = [IO.File]::ReadAllText($inputConf) } catch {}
     if ($existing -match 'open-svpflow-lq\.vpy') { Ok 'input.conf already contains interpolation hotkeys, skipping' }
     else {
         Copy-Item $inputConf "$inputConf.bak_$(Get-Date -Format 'yyyyMMdd_HHmmss')"
-        [IO.File]::AppendAllText($inputConf, $inputBlock, (New-Object System.Text.UTF8Encoding($false)))
+        # Ensure a blank line separates existing content from the appended block
+        $prefix = "`r`n"
+        [IO.File]::AppendAllText($inputConf, $prefix + $inputBlock + "`r`n", (New-Object System.Text.UTF8Encoding($false)))
         Ok 'Appended hotkeys to input.conf'
     }
 } else {
-    Write-Utf8NoBom $inputConf ($inputBlock.TrimStart("`r","`n") + "`r`n")
+    Write-Utf8NoBom $inputConf ($inputBlock + "`r`n")
     Ok 'Created input.conf and wrote hotkeys'
 }
 
-[IO.File]::WriteAllText($readme, $readmeText, (New-Object System.Text.UTF8Encoding($false)))
-Ok 'Generated readme.txt'
-
 # ---------------- Step 7: Done ----------------
+Info 'Step 7/7  Finalizing installation'
 Write-Host ''
 Write-Host '  ======================================================' -ForegroundColor Green
 Write-Host '    Installation complete!' -ForegroundColor Green
