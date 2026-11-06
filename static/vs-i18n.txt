@@ -10,6 +10,7 @@ Alt+3 vf set vapoursynth="~~/vs/60fps-hq.vpy" #menu: 视频增强 > 插帧模式
 Alt+4 vf set vapoursynth="~~/vs/open-svpflow-lq.vpy" #menu: 视频增强 > 插帧模式 > VS-OPEN-SVP LQ
 Alt+5 vf set vapoursynth="~~/vs/open-svpflow-mq.vpy" #menu: 视频增强 > 插帧模式 > VS-OPEN-SVP MQ
 Alt+6 vf set vapoursynth="~~/vs/open-svpflow-hq.vpy" #menu: 视频增强 > 插帧模式 > VS-OPEN-SVP HQ
+Alt+7 vf set vapoursynth="~~/vs/open-svpflow-120fps.vpy" #menu: 视频增强 > 插帧模式 > VS-OPEN-SVP 120FPS
 
 [zh-TW]
 # ============ mpv MVTools 插幀 ============
@@ -23,6 +24,7 @@ Alt+3 vf set vapoursynth="~~/vs/60fps-hq.vpy" #menu: 影片增強 > 插幀模式
 Alt+4 vf set vapoursynth="~~/vs/open-svpflow-lq.vpy" #menu: 影片增強 > 插幀模式 > VS-OPEN-SVP LQ
 Alt+5 vf set vapoursynth="~~/vs/open-svpflow-mq.vpy" #menu: 影片增強 > 插幀模式 > VS-OPEN-SVP MQ
 Alt+6 vf set vapoursynth="~~/vs/open-svpflow-hq.vpy" #menu: 影片增強 > 插幀模式 > VS-OPEN-SVP HQ
+Alt+7 vf set vapoursynth="~~/vs/open-svpflow-120fps.vpy" #menu: 影片增強 > 插幀模式 > VS-OPEN-SVP 120FPS
 
 [en]
 # ============ mpv MVTools Interpolation ============
@@ -36,3 +38,4 @@ Alt+3 vf set vapoursynth="~~/vs/60fps-hq.vpy" #menu: Video FX > Interpolation > 
 Alt+4 vf set vapoursynth="~~/vs/open-svpflow-lq.vpy" #menu: Video FX > Interpolation > VS-OPEN-SVP LQ
 Alt+5 vf set vapoursynth="~~/vs/open-svpflow-mq.vpy" #menu: Video FX > Interpolation > VS-OPEN-SVP MQ
 Alt+6 vf set vapoursynth="~~/vs/open-svpflow-hq.vpy" #menu: Video FX > Interpolation > VS-OPEN-SVP HQ
+Alt+7 vf set vapoursynth="~~/vs/open-svpflow-120fps.vpy" #menu: Video FX > Interpolation > VS-OPEN-SVP 120FPS

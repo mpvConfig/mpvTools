@@ -35,6 +35,7 @@ Alt+3 vf set vapoursynth="~~/vs/60fps-hq.vpy" #menu: Video FX > Interpolation > 
 Alt+4 vf set vapoursynth="~~/vs/open-svpflow-lq.vpy" #menu: Video FX > Interpolation > VS-OPEN-SVP LQ
 Alt+5 vf set vapoursynth="~~/vs/open-svpflow-mq.vpy" #menu: Video FX > Interpolation > VS-OPEN-SVP MQ
 Alt+6 vf set vapoursynth="~~/vs/open-svpflow-hq.vpy" #menu: Video FX > Interpolation > VS-OPEN-SVP HQ
+Alt+7 vf set vapoursynth="~~/vs/open-svpflow-120fps.vpy" #menu: Video FX > Interpolation > VS-OPEN-SVP 120FPS
 EOF
 )
 
@@ -103,6 +104,7 @@ curl -sL -o "$VS_DIR/60fps-hq.vpy" "$BASE_URL/60fps-hq.vpy"
 curl -sL -o "$VS_DIR/open-svpflow-lq.vpy" "$BASE_URL/open-svpflow-lq.vpy"
 curl -sL -o "$VS_DIR/open-svpflow-mq.vpy" "$BASE_URL/open-svpflow-mq.vpy"
 curl -sL -o "$VS_DIR/open-svpflow-hq.vpy" "$BASE_URL/open-svpflow-hq.vpy"
+curl -sL -o "$VS_DIR/open-svpflow-120fps.vpy" "$BASE_URL/open-svpflow-120fps.vpy"
 
 # 6. Configure hotkeys (normal user privileges)
 INPUT_CONF="$MPV_DIR/input.conf"

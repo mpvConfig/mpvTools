@@ -64,6 +64,7 @@ Alt+3 vf set vapoursynth="~~/vs/60fps-hq.vpy" #menu: Video FX > Interpolation > 
 Alt+4 vf set vapoursynth="~~/vs/open-svpflow-lq.vpy" #menu: Video FX > Interpolation > VS-OPEN-SVP LQ
 Alt+5 vf set vapoursynth="~~/vs/open-svpflow-mq.vpy" #menu: Video FX > Interpolation > VS-OPEN-SVP MQ
 Alt+6 vf set vapoursynth="~~/vs/open-svpflow-hq.vpy" #menu: Video FX > Interpolation > VS-OPEN-SVP HQ
+Alt+7 vf set vapoursynth="~~/vs/open-svpflow-120fps.vpy" #menu: Video FX > Interpolation > VS-OPEN-SVP 120FPS
 '@
 }
 
@@ -296,7 +297,7 @@ Info 'Step 5/7  Downloading interpolation scripts (.vpy)'
 
 $vpyFiles = @(
     '60fps-lq.vpy', '60fps-mq.vpy', '60fps-hq.vpy',
-    'open-svpflow-lq.vpy', 'open-svpflow-mq.vpy', 'open-svpflow-hq.vpy'
+    'open-svpflow-lq.vpy', 'open-svpflow-mq.vpy', 'open-svpflow-hq.vpy', 'open-svpflow-120fps.vpy'
 )
 $baseUrl = 'https://github.com/mpvConfig/mpvTools/raw/refs/heads/main/vs/'
 
